@@ -12,14 +12,6 @@ var socketio = require('socket.io').listen(4000);
 var SerialPort = require("serialport");
 var serialPort;
 var portName = '/dev/ttyUSB0';///dev/ttyAMA0
-serialPort = new SerialPort(portName, {
-        baudrate: 115200,
-        // defaults for Arduino serial communication
-         dataBits: 8,
-         parity: 'none',
-         stopBits: 1,
-         flowControl: false
-    });
 //var firebase = require("firebase");
 var sendData = "0";
 // socket IO
@@ -86,7 +78,14 @@ app.use(function(err, req, res, next) {
 function serialListener()
 {
     var receivedData = "";
-
+    serialPort = new SerialPort(portName, {
+            baudrate: 115200,
+            // defaults for Arduino serial communication
+             dataBits: 8,
+             parity: 'none',
+             stopBits: 1,
+             flowControl: false
+        });
     serialPort.on("open", function () {
       console.log('open serial communication');
             // Listens to incoming data

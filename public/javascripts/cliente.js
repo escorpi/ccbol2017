@@ -1,4 +1,4 @@
-var sock=io.connect('http://192.168.1.101:4000');
+var sock=io.connect('http://localhost:4000');
 var rojo=0;var verde=0; var azul=0;
 
 setInterval(function(){
