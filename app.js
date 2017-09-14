@@ -9,20 +9,21 @@ var users = require('./routes/users');
 var app = express();
 
 var socketio = require('socket.io').listen(4000);
-var SerialPort = require("serialport");
-var serialPort;
-var portName = '/dev/ttyUSB0';///dev/ttyAMA0
+var SerialPort = require('serialport');
+
+//var serial_port;
+//var portName = 'COM41';///dev/ttyAMA0
 //var firebase = require("firebase");
 var sendData = "0";
 // socket IO
 socketio.sockets.on("connection",function(socket){
     socket.on('send',function(){
-        console.log("dede cliente");
-        socket.broadcast.emit('luces', {r:sendData});
+        console.log("<--dede cliente");
+        //socket.broadcast.emit('luces', {r:sendData});
     });
     socket.on('sliderval', function(data) {
         dato=data;
-        serialPort.write(dato);
+        serial_port.write(dato);
         console.log("enviado al Arduino:"+dato);
     });
 
@@ -73,26 +74,26 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-//comunicacion Serial ini
-//var portName = '/dev/ttyUSB0';///dev/ttyAMA0
+/*/comunicacion Serial ini
+var portName = 'COM41';///dev/ttyAMA0
 function serialListener()
 {
     var receivedData = "";
-    serialPort = new SerialPort(portName, {
-            baudrate: 115200,
+    serial_port = new SerialPort(portName, {
+            baudrate: 115200
             // defaults for Arduino serial communication
              dataBits: 8,
              parity: 'none',
              stopBits: 1,
-             flowControl: false
+             flowControl: false//
         });
-    serialPort.on("open", function () {
+    serial_port.on("open", function () {
       console.log('open serial communication');
             // Listens to incoming data
-       //var sendData;
-        serialPort.on('data', function(data) {
+       var sendData=0,sendDataG=0,sendDataH=0;
+        serial_port.on('data', function(data) {
              receivedData += data.toString();
-             console.log('datos recividos de serialport'+receivedData);
+            // console.log('datos recividos de serialport'+receivedData);
           if (receivedData .indexOf('E') >= 0 && receivedData .indexOf('B') >= 0) {
             sendData = receivedData .substring(receivedData .indexOf('B') + 1, receivedData .indexOf('E'));
                var sensores = sendData;
@@ -116,5 +117,47 @@ function serialListener()
     });
 }
 serialListener();
+*/
+var SerialPort = require('serialport');
+var serial_port = new SerialPort('COM45', {
+  baudRate: 115200
+});
+ 
+serial_port.write('a255', function(err) {
+  if (err) {
+    return console.log('Error on write: ', err.message);
+  }
+  console.log('message written');
+});
+ 
+serial_port.on('open', function() {
+  serial_port.on('data', function (data) {
+    //console.log('Data:', data);
+    //receivedData += data.toString();
+    //console.log('Data:'+ data);
+    var receivedData = ""+data;
+    if (receivedData .indexOf('E') >= 0 && receivedData .indexOf('B') >= 0) {
+                sendData = receivedData .substring(receivedData .indexOf('B') + 1, receivedData .indexOf('E'));
+                  var colores = sendData;
+                  var s = colores.split(" ");console.log("---------------");
+                  var sr=s[0];
+                  var sv=s[1];
+                  var sa=s[2];
+                  console.log('rojo:'+sr+' verde:'+sv+' azul:'+sa);
+                  socketio.emit('sensor',{r:sr,v:sv,a:sa} );
+                receivedData = '';
+        }
 
+  });
+});
+/*
+setInterval(function(){
+  var r=parseInt(Math.random() *(255 - 0) + 0);
+  var v=parseInt(Math.random() *(255 - 0) + 0);
+  var a=parseInt(Math.random() *(255 - 0) + 0);
+    serial_port.write('a'+r);
+    serial_port.write('r'+r);
+    serial_port.write('v'+r);
+    console.log("enviado a Arduino:"+r+" "+v+" "+a);
+},1600);*/
 module.exports = app;

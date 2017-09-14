@@ -1,6 +1,6 @@
 var sock=io.connect('http://localhost:4000');
 var rojo=0;var verde=0; var azul=0;
-
+//puede borrarse
 setInterval(function(){
 	sock.emit("send","desde el cliente");
 },10000);
@@ -11,12 +11,11 @@ sock.on('luces', function (data) {
 
 //comprobar  si esta online con el servidor.
 sock.on('disconnect', function ()
-   {
-        console.log('desconectado!');
+   {    console.log('desconectado!');
         alert("Se perdio conexion con el servidor");
         //open(location, '_self').close();
    });
-//=================== aki pruebo con firebase ============================\\\\\\\\\\\\\\\\\\
+//=================== aki pruebo con firebase =====================\\\\\\\\\\\\\\\\\\
 // Initialize Firebase
 var config = {
   apiKey: "AIzaSyCL3aOba5DDiVAEAudGGOUL9gfB2TGnvTo",
@@ -34,35 +33,34 @@ firebase.initializeApp(config);
 // recuperar datos
 bdSensores.on('value', function(snapshot){
    var s= snapshot.val();
-  console.log("rojo:"+s.rojo);
-  console.log("verde"+s.verde);
-  console.log("azul"+s.azul);
-
+  console.log("rojo_js:"+s.rojo);
+  console.log("verde_js"+s.verde);
+  console.log("azul_js"+s.azul);
+  sock.emit('sliderval','r'+s.rojo);
+  sock.emit('sliderval','v'+s.verde);
+  sock.emit('sliderval','a'+s.azul);
 });
 // escribir datos
 function actualizarFB(a,b,c){
 
 bdSensores.update({
+  azul:c,
   rojo:a,
-  verde:b,
-  azul:c
+  verde:b
+  
 });
 }
 //=====================fin ==========================================\\\\\\\\\\\\\\\\\\\\\
 /////////////////////////////////////////////////////
-iosocket=sock;
+iosocket=sock;/*
 iosocket.on('sensor', function (data) {
-		    rojo=data.lr;
-		    verde=data.lv;
-		    azul=data.la;
-        actualizarFB(rojo,verde,azul);
-		});
+		    rojo=data.sr;
+		    verde=data.sv;
+		    azul=data.sa;
+        console.log("rojo->:"+rojo);
+        console.log("verde->:"+verde);
+        console.log("azul->:"+azul);
+        //actualizarFB(rojo,verde,azul);
+		}); */
 
-function fire(){
-  rojo =1;verde+=1;
-  bdSensores.update({
-    rojo:rojo,
-		verde:verde
-  });
-	sock.emit('sliderval','a1');
-}
+

@@ -2,22 +2,125 @@ extends layout
 
 block content
   doctype html
-  html(lang='en')
+  html
     head
-      title Jade
-      script(type='text/javascript').
-        foo = true;
-        bar = function () {};
-        if (foo) {
-        bar(1 + 5)
-        }
-    body
-      h1 Jade - node template engine
-      #container.col
-        p You are amazing
-        p
-          | Jade is a terse and simple
-          | templating language with a
-          | strong focus on performance
-          | and powerful features.
-      button(name='button', onclick="fire()") Click me
+      meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+      style#stndz-style.
+      title SCESI-UMS
+      link(rel='stylesheet', href='/stylesheets/main.css')
+      script(src='https://www.gstatic.com/firebasejs/4.3.0/firebase.js')
+    body.section-overview
+      #wrap
+        #content
+          #section
+            #demo-strip.strip
+              #demo-content.strip-content
+                h2 Kinect - Control
+                // ============================== INICIO DEMO APP ==============================
+                #demo-app
+                  script(src='/javascripts/jscolor.js')
+                  #demo-preview(style='border-color: rgb(255, 255, 255); color: rgb(255, 255, 255); background-color: rgb(171, 9, 59);')
+                    | Bienvenidos 
+                    br
+                    | 				Aguas danzantes CCBOL-2017
+                    br
+                    big ♥
+                  #demo-links
+                    div
+                      textarea(maxlength='20')
+                        | Mensaje..
+                      a(onclick='') Enviar
+                    | 				Escribe un mensaje para mostrarlo en pantalla (max. 20 letras).
+                  .panel.bgcolor
+                    button#bgcolor-button(style='color: rgb(255, 255, 255); background-image: none; background-color: rgb(171, 9, 59);') Cambia Color
+                  .panel.fgcolor
+                    button#fgcolor-button(style='color: rgb(0, 0, 0);display:none; background-image: none; background-color: rgb(255, 255, 255);') Color Mensaje
+                  script.
+                    // Initialize Firebase
+                    var config = {
+                    apiKey: "AIzaSyCL3aOba5DDiVAEAudGGOUL9gfB2TGnvTo",
+                    authDomain: "ccbol-2017.firebaseapp.com",
+                    databaseURL: "https://ccbol-2017.firebaseio.com",
+                    projectId: "ccbol-2017",
+                    storageBucket: "ccbol-2017.appspot.com",
+                    messagingSenderId: "10555400118"
+                    };
+                    firebase.initializeApp(config);
+                    console.log("se inicializo firebase!!");
+                    var bdSensores= firebase.database().ref().child('Luces');
+                    //var bdActuadores= firebase.database().ref().child('actuadores');
+                    // recuperar datos
+                    bdSensores.on('value', function(snapshot){
+                    var s= snapshot.val();
+                    pickers.bgcolor.fromRGB(s.rojo,s.verde,s.azul);
+                    //pickers.fgcolor.fromRGB(s.rojo,s.verde,s.azul);
+                    console.log("azul"+s.azul);
+                    console.log("rojo:"+s.rojo);
+                    console.log("verde"+s.verde);
+                    });
+                    // escribir datos
+                    function actualizarFB(a,b,c){
+                    bdSensores.update({
+                    rojo:a,
+                    verde:b,
+                    azul:c
+                    });
+                    }//=============fin============================
+                    var options = {
+                    valueElement: null,
+                    width: 300,
+                    height: 120,
+                    sliderSize: 20,
+                    position: 'top',
+                    borderColor: '#CCC',
+                    insetColor: '#CCC',
+                    backgroundColor: '#202020'
+                    };
+                    var pickers = {};
+                    pickers.bgcolor = new jscolor('bgcolor-button', options);
+                    pickers.bgcolor.onFineChange = "update('bgcolor')";
+                    pickers.bgcolor.fromRGB(159,18,65);
+                    pickers.fgcolor = new jscolor('fgcolor-button', options);
+                    pickers.fgcolor.onFineChange = "update('fgcolor')";
+                    pickers.fgcolor.fromString('FFFFFF');
+                    function update (id) {
+                    document.getElementById('demo-preview').style.backgroundColor =
+                    pickers.bgcolor.toHEXString();
+                    document.getElementById('demo-preview').style.color =
+                    document.getElementById('demo-preview').style.borderColor =
+                    pickers.fgcolor.toHEXString();
+                    if (id=='bgcolor') {
+                    var r=Math.round(pickers[id].rgb[0]);
+                    var v=Math.round(pickers[id].rgb[1]);
+                    var a=Math.round(pickers[id].rgb[2]);
+                    console.log("rojo:"+ r+" verde:"+v+" azul:"+a);
+                    actualizarFB(r,v,a);
+                    }
+                    }
+                    function setHSV (id, h, s, v) {
+                    pickers[id].fromHSV(h, s, v);
+                    update(id);
+                    }
+                    function setRGB (id, r, g, b) {
+                    pickers[id].fromRGB(r, g, b);
+                    update(id);
+                    }
+                    function setString (id, str) {
+                    pickers[id].fromString(str);
+                    update(id);
+                    }
+                    update('bgcolor');
+                    update('fgcolor');
+                // ============================== END  ==============================
+            // termina   la app
+          // seccion
+        // contents
+        #footer
+          #footer-content
+            #footer-related
+              strong Tags:
+              | 				CCBOL2017 - Easi Control
+            #footer-copyright
+              | © 2017 SCESI-UMSS
+      // wrap
+
