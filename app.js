@@ -74,50 +74,7 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-/*/comunicacion Serial ini
-var portName = 'COM41';///dev/ttyAMA0
-function serialListener()
-{
-    var receivedData = "";
-    serial_port = new SerialPort(portName, {
-            baudrate: 115200
-            // defaults for Arduino serial communication
-             dataBits: 8,
-             parity: 'none',
-             stopBits: 1,
-             flowControl: false//
-        });
-    serial_port.on("open", function () {
-      console.log('open serial communication');
-            // Listens to incoming data
-       var sendData=0,sendDataG=0,sendDataH=0;
-        serial_port.on('data', function(data) {
-             receivedData += data.toString();
-            // console.log('datos recividos de serialport'+receivedData);
-          if (receivedData .indexOf('E') >= 0 && receivedData .indexOf('B') >= 0) {
-            sendData = receivedData .substring(receivedData .indexOf('B') + 1, receivedData .indexOf('E'));
-               var sensores = sendData;
-               var s = sensores.split(" ");
-               var st=s[0];
-               var sg=s[1];
-               var sh=s[2];
-               console.log('temperatura:'+st+' Gas:'+sg+' humedad:'+sh);
-             sendData=st;
-             sendDataH=sh;
-             sendDataG=sg;
-           receivedData = '';
-         }
-         // send the incoming data to browser with websockets.
-         var date = new Date().getTime();
-       socketio.emit('sensor',{st:sendData,sh:sendDataH,sg:sendDataG} );
-       sendData=sendData*1.000;
-       socketio.emit('temperatureUpdate',date,sendData );
-       console.log("a la pagina:-->"+sendData);
-      });
-    });
-}
-serialListener();
-*/
+
 var SerialPort = require('serialport');
 var serial_port = new SerialPort('COM45', {
   baudRate: 115200
